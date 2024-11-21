@@ -1,49 +1,23 @@
-import { createSlice } from "react-redux"
-import { persist, createJSONStorage } from "react-redux";
-import { produce } from "immer";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
+import {
+  toggleOpen,
+  setIsOpen,
+  setIsHover,
+  updateSettings,
+  selectSidebarState,
+} from "@/app/store/features/sidebarSlice";
+import type { SidebarSettings } from "@/types/sidebar";
 
-type SidebarSettings = { disabled: boolean; isHoverOpen: boolean };
-type SidebarStore = {
-  isOpen: boolean;
-  isHover: boolean;
-  settings: SidebarSettings;
-  toggleOpen: () => void;
-  setIsOpen: (isOpen: boolean) => void;
-  setIsHover: (isHover: boolean) => void;
-  getOpenState: () => boolean;
-  setSettings: (settings: Partial<SidebarSettings>) => void;
-};
+export function useSidebar() {
+  const dispatch = useAppDispatch();
+  const sidebarState = useAppSelector(selectSidebarState);
 
-export const useSidebar = create(
-  persist<SidebarStore>(
-    (set, get) => ({
-      isOpen: true,
-      isHover: false,
-      settings: { disabled: false, isHoverOpen: false },
-      toggleOpen: () => {
-        set({ isOpen: !get().isOpen });
-      },
-      setIsOpen: (isOpen: boolean) => {
-        set({ isOpen });
-      },
-      setIsHover: (isHover: boolean) => {
-        set({ isHover });
-      },
-      getOpenState: () => {
-        const state = get();
-        return state.isOpen || (state.settings.isHoverOpen && state.isHover);
-      },
-      setSettings: (settings: Partial<SidebarSettings>) => {
-        set(
-          produce((state: SidebarStore) => {
-            state.settings = { ...state.settings, ...settings };
-          })
-        );
-      }
-    }),
-    {
-      name: "sidebar",
-      storage: createJSONStorage(() => localStorage)
-    }
-  )
-);
+  return {
+    ...sidebarState,
+    toggleOpen: () => dispatch(toggleOpen()),
+    setIsOpen: (isOpen: boolean) => dispatch(setIsOpen(isOpen)),
+    setIsHover: (isHover: boolean) => dispatch(setIsHover(isHover)),
+    setSettings: (settings: Partial<SidebarSettings>) =>
+      dispatch(updateSettings(settings)),
+  };
+}

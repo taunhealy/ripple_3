@@ -82,3 +82,23 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .sidebar-container {
+    @apply fixed left-0 top-0 z-40 h-screen w-64 -translate-x-full border-r bg-background transition-transform lg:translate-x-0;
+  }
+
+  .sidebar-container[data-state="open"] {
+    @apply translate-x-0;
+  }
+
+  .sidebar-overlay {
+    @apply fixed inset-0 z-30 bg-background/80 backdrop-blur-sm transition-all duration-100 
+    data-[state=closed]:animate-out data-[state=closed]:fade-out 
+    data-[state=open]:animate-in data-[state=open]:fade-in lg:hidden;
+  }
+
+  .sidebar-overlay[data-state="closed"] {
+    @apply hidden;
+  }
+}

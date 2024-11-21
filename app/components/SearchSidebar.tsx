@@ -4,16 +4,16 @@ import { useGenres } from "@/app/hooks/useGenres";
 import { Checkbox } from "@/app/components/ui/checkbox";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
-import { PresetType, PriceType, VstType } from "@prisma/client";
+import { PresetType, PriceType } from "@prisma/client";
 import { SearchFilters } from "@/types/SearchTypes";
 import { useDebounce } from "@/app/hooks/useDebounce";
 import { useState, useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ItemType } from "@prisma/client";
+import { MultiSelect } from "@/app/components/ui/MultiSelect";
 
 const PRESET_TYPES = Object.values(PresetType);
 const PRICE_TYPES = Object.values(PriceType);
-const VST_TYPES = Object.values(VstType);
 
 interface SearchSidebarProps {
   filters: SearchFilters;
@@ -31,6 +31,16 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const queryClient = useQueryClient();
 
+  // Fetch VSTs
+  const { data: vsts } = useQuery({
+    queryKey: ["vsts"],
+    queryFn: async () => {
+      const response = await fetch("/api/vsts");
+      if (!response.ok) throw new Error("Failed to fetch VSTs");
+      return response.json();
+    },
+  });
+
   const filterMutation = useMutation({
     mutationFn: (newFilters: Partial<SearchFilters>) => {
       updateFilters(newFilters);
@@ -46,6 +56,20 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
     filterMutation.mutate({
       ...filters,
       searchTerm: value,
+    });
+  };
+
+  const handleGenresChange = (selectedGenres: string[]) => {
+    filterMutation.mutate({
+      ...filters,
+      genres: selectedGenres,
+    });
+  };
+
+  const handleVstsChange = (selectedVsts: string[]) => {
+    filterMutation.mutate({
+      ...filters,
+      vstTypes: selectedVsts,
     });
   };
 
@@ -107,11 +131,7 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
               id={`preset-${presetType}`}
               checked={filters.presetTypes?.includes(presetType)}
               onCheckedChange={(checked) =>
-                handleFilterChange(
-                  "presetTypes",
-                  presetType,
-                  checked as boolean
-                )
+                handleFilterChange("presetTypes", presetType, checked as boolean)
               }
             />
             <Label htmlFor={`preset-${presetType}`} className="ml-2">
@@ -121,42 +141,36 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
         ))}
       </div>
 
-      {/* VST Types */}
+      {/* VSTs */}
       <div className="space-y-2">
         <h3 className="font-medium">VST</h3>
-        {VST_TYPES.map((vstType) => (
-          <div key={vstType} className="flex items-center">
-            <Checkbox
-              id={`vst-${vstType}`}
-              checked={filters.vstTypes?.includes(vstType)}
-              onCheckedChange={(checked) =>
-                handleFilterChange("vstTypes", vstType, checked as boolean)
-              }
-            />
-            <Label htmlFor={`vst-${vstType}`} className="ml-2">
-              {vstType.charAt(0) + vstType.slice(1).toLowerCase()}
-            </Label>
-          </div>
-        ))}
+        <MultiSelect
+          options={
+            vsts?.map((vst: any) => ({
+              value: vst.id,
+              label: vst.name,
+            })) || []
+          }
+          value={filters.vstTypes || []}
+          onChange={handleVstsChange}
+          placeholder="Search VSTs..."
+        />
       </div>
 
       {/* Genres */}
       <div className="space-y-2">
         <h3 className="font-medium">Genres</h3>
-        {genres?.map((genre) => (
-          <div key={genre.id} className="flex items-center">
-            <Checkbox
-              id={`genre-${genre.id}`}
-              checked={filters.genres?.includes(genre.id)}
-              onCheckedChange={(checked) =>
-                handleFilterChange("genres", genre.id, checked as boolean)
-              }
-            />
-            <Label htmlFor={`genre-${genre.id}`} className="ml-2">
-              {genre.name}
-            </Label>
-          </div>
-        ))}
+        <MultiSelect
+          options={
+            genres?.map((genre: any) => ({
+              value: genre.id,
+              label: genre.name,
+            })) || []
+          }
+          value={filters.genres || []}
+          onChange={handleGenresChange}
+          placeholder="Search genres..."
+        />
       </div>
     </div>
   );

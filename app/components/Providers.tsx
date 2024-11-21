@@ -2,10 +2,11 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
+import { Provider as ReduxProvider } from "react-redux";
+import { store } from "@/app/store/store";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 
-// Dynamically import DevTools with no SSR
 const ReactQueryDevTools = dynamic(
   () =>
     import("@tanstack/react-query-devtools").then((d) => d.ReactQueryDevtools),
@@ -30,16 +31,18 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <SessionProvider>
-      <QueryClientProvider client={queryClient}>
-        {children}
-        {process.env.NODE_ENV === "development" && (
-          <ReactQueryDevTools
-            initialIsOpen={false}
-            buttonPosition="bottom-right"
-          />
-        )}
-      </QueryClientProvider>
-    </SessionProvider>
+    <ReduxProvider store={store}>
+      <SessionProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+          {process.env.NODE_ENV === "development" && (
+            <ReactQueryDevTools
+              initialIsOpen={false}
+              buttonPosition="bottom-right"
+            />
+          )}
+        </QueryClientProvider>
+      </SessionProvider>
+    </ReduxProvider>
   );
 }

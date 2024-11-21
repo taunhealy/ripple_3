@@ -20,7 +20,7 @@ export function MultiSelect({
   options,
   value,
   onChange,
-  placeholder = "Search presets...",
+  placeholder = "Search...",
 }: MultiSelectProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -39,6 +39,9 @@ export function MultiSelect({
     );
   };
 
+  // Calculate dynamic height based on number of options (max 200px)
+  const contentHeight = Math.min(filteredOptions.length * 36 + 8, 200);
+
   return (
     <div className="space-y-2">
       <Input
@@ -46,11 +49,14 @@ export function MultiSelect({
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
-      <ScrollArea className="h-[300px] rounded-md border">
+      <ScrollArea 
+        className={`rounded-md border`} 
+        style={{ height: `${contentHeight}px` }}
+      >
         <div className="p-2">
           {filteredOptions.length === 0 ? (
             <p className="text-sm text-muted-foreground p-2">
-              No presets found
+              No {placeholder.toLowerCase().includes("vst") ? "VSTs" : "genres"} found
             </p>
           ) : (
             <div className="space-y-1">

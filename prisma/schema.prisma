@@ -70,7 +70,7 @@ model PresetUpload {
   vst             VST?             @relation(fields: [vstId], references: [id], onDelete: SetNull)
   vstId           String?
 
-  presetRequevststId String?
+  presetRequestId String?
   wishlistItems   WishlistItem[]
 
   

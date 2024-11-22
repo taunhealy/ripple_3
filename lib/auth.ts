@@ -15,11 +15,6 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-  pages: {
-    signIn: '/login',
-    signOut: '/logout',
-    error: '/auth/error',
-  },
   callbacks: {
     async jwt({ token, user, account }) {
       // Initial sign in

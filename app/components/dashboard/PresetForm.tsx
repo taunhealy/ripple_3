@@ -1,7 +1,8 @@
 "use client";
 
+import React from "react";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -107,6 +108,15 @@ export function PresetForm({ initialData, presetId }: PresetFormProps) {
     },
   });
 
+  // Check session and bounce if user isn't authed
+  console.log("Session:", session?.user);
+  useEffect(() => {
+    if (!session?.user?.id) {
+      toast.error("Please sign in to create presets");
+      router.push("/sign-in");
+    }
+  }, [session, router]);
+  
   const mutation = useMutation({
     mutationFn: async (data: PresetFormData) => {
       if (!session?.user?.id) {
@@ -213,6 +223,7 @@ export function PresetForm({ initialData, presetId }: PresetFormProps) {
         )}
       </div>
 
+// Genre
       <div className="space-y-2">
         <Label>Genre</Label>
         <Controller
@@ -227,6 +238,7 @@ export function PresetForm({ initialData, presetId }: PresetFormProps) {
         )}
       </div>
 
+// VST
       <div className="space-y-2">
         <Label>VST</Label>
         <Controller
@@ -258,6 +270,7 @@ export function PresetForm({ initialData, presetId }: PresetFormProps) {
         )}
       </div>
 
+// Preset Type
       <div className="space-y-2">
         <Label>Preset Type</Label>
         <Controller
@@ -283,6 +296,7 @@ export function PresetForm({ initialData, presetId }: PresetFormProps) {
         )}
       </div>
 
+// Preset File
       <div className="space-y-4">
         <div>
           <Label>Preset File</Label>
@@ -357,6 +371,7 @@ export function PresetForm({ initialData, presetId }: PresetFormProps) {
         </div>
       </div>
 
+// Price Type
       <div className="space-y-2">
         <Label>Price Type</Label>
         <Controller

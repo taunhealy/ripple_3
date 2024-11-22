@@ -25,30 +25,20 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.id) {
-      console.log("Unauthorized session:", session); // Debug log
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Try to find or create user
-    let user = await prisma.user.findUnique({
-      where: { email: session.user.email! },
+    let user: { id: string; email: string } | null = await prisma.user.findUnique({
+      where: { email: session?.user.email! },
     });
 
-    if (!user) {
-      // Create user if they don't exist
-      user = await prisma.user.create({
-        data: {
-          email: session.user.email!,
-          name: session.user.name!,
-          image: session.user.image,
-        },
-      });
-      console.log("Created new user in API route:", user);
+    if (!session?.user?.id) {
+      console.log("Unauthorized session:", session);
+      return NextResponse.redirect(new URL('/auth/signin', request.url));
     }
+
+    
 
     const body = await request.json();
     console.log("Request body:", body);
+    console.log("User ID:", user?.id) ;
 
     const validatedData = presetSchema.parse(body);
 
@@ -68,6 +58,7 @@ export async function POST(request: Request) {
     const preset = await prisma.presetUpload.create({
       data: {
         ...validatedData,
+        // @ts-ignore
         userId: user.id, // Use the database user ID
       },
     });

@@ -14,6 +14,7 @@ interface MultiSelectProps {
   value: string[];
   onChange: (value: string[]) => void;
   placeholder?: string;
+  className?: string; 
 }
 
 export function MultiSelect({

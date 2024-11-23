@@ -7,7 +7,7 @@ import { Input } from "@/app/components/ui/input";
 import { PresetType, PriceType } from "@prisma/client";
 import { SearchFilters } from "@/types/SearchTypes";
 import { useDebounce } from "@/app/hooks/useDebounce";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ItemType } from "@prisma/client";
 import { MultiSelect } from "@/app/components/ui/MultiSelect";
@@ -19,6 +19,7 @@ interface SearchSidebarProps {
   filters: SearchFilters;
   updateFilters: (filters: SearchFilters) => void;
   itemType: ItemType;
+  className: String;
 }
 
 export const SearchSidebar: React.FC<SearchSidebarProps> = ({
@@ -92,18 +93,15 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h3 className="font-medium">Search</h3>
-        <Input
-          type="text"
-          placeholder="Search presets..."
-          value={searchTerm}
-          onChange={(e) => handleSearchChange(e.target.value)}
-        />
-      </div>
+    <div className="space-y-6 color">
+      <h3 className="font-medium">Search</h3>
+      <Input
+        type="text"
+        placeholder="Search presets..."
+        value={searchTerm}
+        onChange={(e) => handleSearchChange(e.target.value)}
+      />
 
-      {/* Price Types */}
       <div className="space-y-2">
         <h3 className="font-medium">Price</h3>
         {PRICE_TYPES.map((priceType) => (
@@ -122,7 +120,6 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
         ))}
       </div>
 
-      {/* Preset Types */}
       <div className="space-y-2">
         <h3 className="font-medium">Preset Type</h3>
         {PRESET_TYPES.map((presetType) => (
@@ -141,7 +138,6 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
         ))}
       </div>
 
-      {/* VSTs */}
       <div className="space-y-2">
         <h3 className="font-medium">VST</h3>
         <MultiSelect
@@ -154,10 +150,10 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
           value={filters.vstTypes || []}
           onChange={handleVstsChange}
           placeholder="Search VSTs..."
+          className="custom-multiselect"
         />
       </div>
 
-      {/* Genres */}
       <div className="space-y-2">
         <h3 className="font-medium">Genres</h3>
         <MultiSelect
@@ -170,6 +166,7 @@ export const SearchSidebar: React.FC<SearchSidebarProps> = ({
           value={filters.genres || []}
           onChange={handleGenresChange}
           placeholder="Search genres..."
+          className="custom-multiselect"
         />
       </div>
     </div>

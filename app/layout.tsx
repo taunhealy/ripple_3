@@ -34,7 +34,7 @@ export default function RootLayout({
           <div className="flex flex-col min-h-screen">
             <Navbar />
             <div className="flex flex-1">
-              <SidebarProvider defaultOpen={true}>
+              <SidebarProvider>
                 <AppSidebar />
                 <main className="flex-1 p-4">
                   <SidebarTrigger />

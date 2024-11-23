@@ -1,4 +1,4 @@
-- Add Serum and Vital as checkboxes
+
 - Style tabs - tabs bar with tabs placed horizointal flex
 - Make VST and Genre have 3 visible options
 - Create preset API
@@ -8,3 +8,4 @@
 - Preset Request api routing
 - Checkout routing
 - Split Payments routing
+- Sidebar change background color

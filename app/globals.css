@@ -102,3 +102,16 @@
     @apply hidden;
   }
 }
+
+.custom-multiselect .react-select__control {
+  @apply h-8 min-h-8 px-2 text-sm; /* Smaller height, padding, and font */
+}
+
+.custom-multiselect .react-select__menu {
+  @apply text-sm; /* Smaller font size for dropdown items */
+}
+
+.custom-multiselect .react-select__option {
+  @apply h-7 flex items-center; /* Smaller dropdown item height */
+}
+

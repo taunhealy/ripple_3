@@ -80,49 +80,80 @@ export function ContentExplorer({
     const { status } = useSession();
     const isAuthenticated = status === "authenticated";
 
+    const handleTabChange = (value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("view", value);
+      router.push(`/requests?${params.toString()}`);
+      setState((prev) => ({
+        ...prev,
+        activeTab: value as ContentViewMode | RequestViewMode,
+      }));
+    };
+    
+
     return (
       <div className="space-y-4">
-        <Tabs
-          value={state.activeTab}
-          onValueChange={(value) => {
-            const params = new URLSearchParams(searchParams.toString());
-            params.set("view", value);
-            router.push(`/requests?${params.toString()}`);
-            setState((prev) => ({
-              ...prev,
-              activeTab: value as ContentViewMode | RequestViewMode,
-            }));
-          }}
-        >
-          <TabsList className="mb-4">
-            <TabsTrigger value={RequestViewMode.PUBLIC}>All</TabsTrigger>
-            {isAuthenticated && (
-              <TabsTrigger value={RequestViewMode.REQUESTED}>
-                My Requests
-              </TabsTrigger>
-            )}
-          </TabsList>
-        </Tabs>
+       <div>
 
-        <Tabs
-          value={state.status}
-          onValueChange={(value) => {
-            const params = new URLSearchParams(searchParams.toString());
-            const currentView = params.get("view") || state.activeTab;
-            params.set("view", currentView);
-            params.set("status", value);
-            router.push(`/requests?${params.toString()}`);
-            setState((prev) => ({
-              ...prev,
-              status: value,
-            }));
-          }}
-        >
-          <TabsList className="mb-4">
-            <TabsTrigger value={RequestStatus.OPEN}>Open</TabsTrigger>
-            <TabsTrigger value={RequestStatus.SATISFIED}>Satisfied</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        
+  <button
+    onClick={() => handleTabChange(RequestViewMode.PUBLIC)}
+    style={{
+      all: "unset",
+      cursor: "pointer",
+      fontWeight: state.activeTab === RequestViewMode.PUBLIC ? "bold" : "normal",
+    }}
+  >
+    All
+  </button>
+  {isAuthenticated && (
+    <>
+      {" | "}
+      <button
+        onClick={() => handleTabChange(RequestViewMode.REQUESTED)}
+        style={{
+          all: "unset",
+          cursor: "pointer",
+          fontWeight:
+            state.activeTab === RequestViewMode.REQUESTED ? "bold" : "normal",
+        }}
+      >
+        My Requests
+      </button>
+    </>
+  )}
+</div>
+
+
+      <div className="flex space-x-4 mb-4">
+  {[
+    { label: "Open", value: RequestStatus.OPEN },
+    { label: "Satisfied", value: RequestStatus.SATISFIED },
+  ].map((tab) => (
+    <button
+      key={tab.value}
+      className={`text-sm ${
+        state.status === tab.value
+          ? "font-bold text-black"
+          : "text-gray-600 hover:text-black"
+      }`}
+      onClick={() => {
+        const params = new URLSearchParams(searchParams.toString());
+        const currentView = params.get("view") || state.activeTab;
+        params.set("view", currentView);
+        params.set("status", tab.value);
+        router.push(`/requests?${params.toString()}`);
+        setState((prev) => ({
+          ...prev,
+          status: tab.value,
+        }));
+      }}
+    >
+      {tab.label}
+    </button>
+  ))}
+</div>
+
 
         <PresetRequestGrid
           requests={items}
@@ -136,36 +167,41 @@ export function ContentExplorer({
   const renderContentTabs = () => {
     const { status } = useSession();
     const isAuthenticated = status === "authenticated";
-
     return (
       <div className="space-y-4">
         {isAuthenticated && (
-          <Tabs
-            value={contentViewMode}
-            onValueChange={(value) => {
-              const params = new URLSearchParams(searchParams.toString());
-              params.set("view", value);
-              router.push(`/${itemType.toLowerCase()}s?${params.toString()}`);
-              setState((prev) => ({
-                ...prev,
-                activeTab: value as ContentViewMode | RequestViewMode,
-              }));
-            }}
-          >
-            <TabsList className="mb-4">
-              <TabsTrigger value={ContentViewMode.EXPLORE}>All</TabsTrigger>
-              <TabsTrigger value={ContentViewMode.UPLOADED}>
-                My Uploads
-              </TabsTrigger>
-              <TabsTrigger value={ContentViewMode.DOWNLOADED}>
-                Downloaded
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="flex space-x-6 mb-4">
+            {[
+              { label: "Explore", value: ContentViewMode.EXPLORE },
+              { label: "My Uploads", value: ContentViewMode.UPLOADED },
+              { label: "My Downloads", value: ContentViewMode.DOWNLOADED },
+            ].map((tab) => (
+              <button
+                key={tab.value}
+                className={`text-base font-medium ${
+                  state.activeTab === tab.value
+                    ? "text-black"
+                    : "text-gray-500 hover:text-black"
+                }`}
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.set("view", tab.value);
+                  router.push(`/${itemType.toLowerCase()}s?${params.toString()}`);
+                  setState((prev) => ({
+                    ...prev,
+                    activeTab: tab.value as ContentViewMode | RequestViewMode,
+                  }));
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         )}
         {renderContentGrid()}
       </div>
     );
+    
   };
 
   const renderContentGrid = () => {
@@ -211,7 +247,7 @@ export function ContentExplorer({
     <div className="container mx-auto px-4 py-8 min-w-[1024px]">
       <div className="flex flex-col md:flex-row gap-8">
         <aside className="w-full md:w-64 min-w-[256px] space-y-6">
-          <SearchSidebar
+          <SearchSidebar className="bg-black"
             filters={filters}
             updateFilters={updateFilters}
             itemType={itemType}
